@@ -1,21 +1,24 @@
-# Java Maven CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
-version: 2
+version: 2.1
+
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      - image: jbat-dev/buildtool:latest
-
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
 
-      - run: docker build -t mvnsample:test .
+      - run: 
+          name: mvn package
+          command: |
+            cd web-app
+            mvn package
+
+      - store_artifacts:
+          path: ./web-app/target/web-app.war
+          destination: warfile
 
 workflows:
-  version: 2
-  build:
+  version: 2.1
+  mvn_build:
     jobs:
       - build

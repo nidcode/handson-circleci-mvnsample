@@ -1,7 +1,0 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circlci/
-
-git config --global core.editor 'vim -c "set fenc=utf-8"'
