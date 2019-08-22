@@ -1,3 +1,0 @@
-FROM tomcat:alpine
-
-COPY web-app/target/web-app.war /usr/local/tomcat/webapps/ROOT.war
