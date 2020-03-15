@@ -35,7 +35,7 @@ workflows:
   version: 2.1
   scan-image:
     jobs:
-      - docker-build:
+      - docker-build
       - twistcli/scan-image:
           requires:
             - docker-build
