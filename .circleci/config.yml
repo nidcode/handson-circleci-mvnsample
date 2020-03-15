@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  twistcli-scan: twistlock/twistcli-scan@1.0.5
+  twistcli: twistlock/twistcli-scan@1.0.5
 
 jobs:
   docker-build:
