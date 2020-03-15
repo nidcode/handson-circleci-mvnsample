@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  twistcli-scan: twistlock/twistcli-scan@1.0.5
+
 jobs:
   build:
     docker:
@@ -12,13 +15,36 @@ jobs:
           command: |
             cd web-app
             mvn package
+      
+      - run:
+          name: docker build
+          command: docker build -t nidstyle3/mvnsample:$CIRCLE:SHA1 .
+      
+      - run:
+          name: store docker image
+          command: |
+            mkdir -p workspace
+            docker save nidstyle3/mvnsample:$CIRCLE:SHA1 -o workspace/image.tar
 
-      - store_artifacts:
-          path: ./web-app/target/web-app.war
-          destination: warfile
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - image.tar
 
 workflows:
   version: 2.1
-  mvn_build:
+  scan-image:
     jobs:
-      - build
+      - build:
+      - twistcli/scan-image:
+          requires:
+            - build
+          context: jb_prisma
+          image: "nidstyle3/mvnsample:$CIRCLE_SHA1"
+          image-tar: image.tar
+          vuln-thresh: critical
+          comp-thresh: ''
+          only-fixed: true
+          filters:
+            branches:
+              only: /security\/twistlock.*/
