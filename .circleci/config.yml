@@ -4,7 +4,7 @@ orbs:
   twistcli-scan: twistlock/twistcli-scan@1.0.5
 
 jobs:
-  build:
+  docker-build:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
@@ -35,10 +35,10 @@ workflows:
   version: 2.1
   scan-image:
     jobs:
-      - build:
+      - docker-build:
       - twistcli/scan-image:
           requires:
-            - build
+            - docker-build
           context: jb_prisma
           image: "nidstyle3/mvnsample:$CIRCLE_SHA1"
           image-tar: image.tar
