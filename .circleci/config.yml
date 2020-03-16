@@ -42,7 +42,7 @@ workflows:
           requires:
             - docker-build
           context: jb_prisma
-          image: "nidstyle3/mvnsample:${CIRCLE_SHA1}"
+          image: nidstyle3/mvnsample:${CIRCLE_SHA1}
           image-tar: image.tar
           vuln-thresh: high
           comp-thresh: critical
