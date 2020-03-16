@@ -36,10 +36,19 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - setup_remote_docker
       - run:
           name: scan image file
           command: trivy --severity HIGH,CRITICAL --input /tmp/workspace/image.tar
+
+  check-compliance:
+    docker:
+      - image: goodwithtech/dockle:latest
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: scan image file
+          command: dockle --input /tmp/workspace/image.tar
 
 workflows:
   version: 2.1
@@ -49,3 +58,12 @@ workflows:
       - scan-image:
           requires:
             - docker-build
+          filters:
+            branches:
+              only: /security\/trivy*/
+      - check-compliance:
+          requires:
+            - docker-build
+          filters:
+            branches:
+              only: /security\/trivy*/
