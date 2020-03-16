@@ -23,7 +23,7 @@ jobs:
           name: store docker image
           command: |
             mkdir -p workspace
-            docker save mvnsample:build -o workspace/image.tar
+            docker save mvnsample:${CIRCLE_SHA1} -o workspace/image.tar
 
       - persist_to_workspace:
           root: workspace
