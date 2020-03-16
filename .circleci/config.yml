@@ -17,7 +17,7 @@ jobs:
       
       - run:
           name: docker build
-          command: docker build -t mvnsample:build .
+          command: docker build -t nidstyle3/mvnsample:${CIRCLE_SHA1} .
       
       - run:
           name: store docker image
@@ -37,8 +37,12 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
-          name: scan image file
-          command: trivy --severity HIGH,CRITICAL --input /tmp/workspace/image.tar
+          name: scan image MEDIUM,HIGH
+          command: trivy --light --exit-code 0 --no-progress --severity MEDIUM,HIGH --input /tmp/workspace/image.tar
+
+      - run:
+          name: scan image CRITICAL
+          command: trivy --light --exit-code 1 --no-progress --severity CRITICAL --input /tmp/workspace/image.tar
 
   check-compliance:
     docker:
@@ -48,7 +52,7 @@ jobs:
           at: /tmp/workspace
       - run:
           name: scan image file
-          command: dockle --input /tmp/workspace/image.tar
+          command: dockle --exit-code 1 --exit-level warn --input /tmp/workspace/image.tar
 
 workflows:
   version: 2.1
