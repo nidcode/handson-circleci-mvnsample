@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  twistcli: twistlock/twistcli-scan@1.0.5
+  twistcli: prisma_cloud/devops_security@1.0.0
 
 jobs:
   docker-build:
@@ -42,11 +42,14 @@ workflows:
           requires:
             - docker-build
           context: jb_prisma
+          prisma_cloud_compute_url: PC_COMPUTE_URL
+          prisma_cloud_compute_user: PC_COMPUTE_USER
+          prisma_cloud_compute_pass: PC_COMPUTE_PASS
           image: mvnsample:build
           image-tar: image.tar
-          vuln-thresh: high
-          comp-thresh: critical
-          only-fixed: true
+          vulnerability_threshold: critical
+          compliance_threshold: ''
+          only_fixed: true
           filters:
             branches:
               only: /security\/twistlock.*/
