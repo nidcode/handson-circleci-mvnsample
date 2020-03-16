@@ -1,4 +1,4 @@
-FROM tomcat:alpine
+FROM tomcat:jdk11-adoptopenjdk-openj9
 
 COPY web-app/target/web-app.war /usr/local/tomcat/webapps/ROOT.war
 
