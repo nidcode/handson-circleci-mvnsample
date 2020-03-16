@@ -1,24 +1,51 @@
 version: 2.1
 
 jobs:
-  build:
+  docker-build:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
+      
+      - setup_remote_docker
 
       - run: 
           name: mvn package
           command: |
             cd web-app
             mvn package
+      
+      - run:
+          name: docker build
+          command: docker build -t mvnsample:build .
+      
+      - run:
+          name: store docker image
+          command: |
+            mkdir -p workspace
+            docker save mvnsample:build -o workspace/image.tar
 
-      - store_artifacts:
-          path: ./web-app/target/web-app.war
-          destination: warfile
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - image.tar
+            
+  scan-image:
+    docker:
+      - image: aquasec/trivy:latest
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: scan image file
+          command: trivy --severity HIGH,CRITICAL --input /tmp/workspace/image.tar
 
 workflows:
   version: 2.1
-  mvn_build:
+  scan-image:
     jobs:
-      - build
+      - docker-build
+      - scan-image:
+          requires:
+            - docker-build
