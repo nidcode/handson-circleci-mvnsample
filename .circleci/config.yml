@@ -42,8 +42,8 @@ workflows:
           requires:
             - docker-build
           context: jb_prisma
-          prisma_cloud_compute_url: PC_COMPUTE_URL
-          prisma_cloud_compute_user: PC_COMPUTE_USER
+          prisma_cloud_compute_url: https://asia-northeast1.cloud.twistlock.com
+          prisma_cloud_compute_user: a_niida@jbat.co.jp
           prisma_cloud_compute_pass: PC_COMPUTE_PASS
           image: mvnsample:build
           image_tar: image.tar
