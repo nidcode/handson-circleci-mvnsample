@@ -46,7 +46,7 @@ workflows:
           prisma_cloud_compute_user: PC_COMPUTE_USER
           prisma_cloud_compute_pass: PC_COMPUTE_PASS
           image: mvnsample:build
-          image-tar: image.tar
+          image_tar: image.tar
           vulnerability_threshold: critical
           compliance_threshold: ''
           only_fixed: true
