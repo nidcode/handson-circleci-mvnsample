@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  twistcli: prisma_cloud/devops_security@1.0.0
+  scan: prisma_cloud/devops_security@1.0.0
 
 jobs:
   docker-build:
@@ -38,7 +38,7 @@ workflows:
   scan-image:
     jobs:
       - docker-build
-      - twistcli/scan_image:
+      - scan/scan_image:
           requires:
             - docker-build
           context: jb_prisma
