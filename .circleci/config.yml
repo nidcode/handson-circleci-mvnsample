@@ -38,7 +38,7 @@ workflows:
   scan-image:
     jobs:
       - docker-build
-      - twistcli/scan-image:
+      - twistcli/scan_image:
           requires:
             - docker-build
           context: jb_prisma
