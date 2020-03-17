@@ -49,7 +49,7 @@ jobs:
 
 workflows:
   version: 2.1
-  scan-image:
+  scan_image:
     jobs:
       - docker-build
       - scan_image:
