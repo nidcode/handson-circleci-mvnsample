@@ -58,4 +58,4 @@ workflows:
           context: jb_prisma
           filters:
             branches:
-              only: /security\/twistlock.*
+              only: /security\/twistlock.*/
