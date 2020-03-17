@@ -33,29 +33,26 @@ jobs:
           paths:
             - image.tar
 
-  scan_image:
-    docker:
-      - image: nidstyle3/twistcli:latest
-    steps:
-      - setup_remote_docker
-      - scan/auth
-      - scan/load:
-          pc_image_tar: image.tar
-          pc_workspace_name: workspace
-          
-      - run:
-          name: scan by twistcli
-          command: twistcli images scan --details --address ${PC_COMPUTE_URL} --token ${AUTH_TOKEN} mvnsample:build  
-
 workflows:
   version: 2.1
   scan_image:
     jobs:
       - docker-build
-      - scan_image:
+      - scan/scan_image:
           requires:
             - docker-build
           context: jb_prisma
+          prisma_cloud_compute_url: https://asia-northeast1.cloud.twistlock.com/anz-3051815
+          prisma_cloud_compute_user: 69060ecb-3677-4596-bfa4-44eb37562aad
+          prisma_cloud_compute_pass: PC_COMPUTE_PASS
+          image: mvnsample:build
+          image_tar: image.tar
+          vulnerability_threshold: critical
+          compliance_threshold: ''
+          only_fixed: true
+          filters:
+            branches:
+              only: /security\/twistlock.*/
           filters:
             branches:
               only: /security\/twistlock.*/
