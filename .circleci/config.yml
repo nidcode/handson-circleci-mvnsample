@@ -33,13 +33,13 @@ jobs:
           paths:
             - image.tar
 
-  scan:
+  scan_image:
     docker:
       - image: nidstyle3/twistcli:latest
     steps:
       - setup_remote_docker
       - scan/auth
-      - scan/load
+      - scan/load:
           pc_image_tar: image.tar
           workspace_name: workspace
           
@@ -52,77 +52,10 @@ workflows:
   scan-image:
     jobs:
       - docker-build
-      - scan/scan_image:
+      - scan_image:
           requires:
             - docker-build
           context: jb_prisma
-          prisma_cloud_compute_url: https://asia-northeast1.cloud.twistlock.com
-          prisma_cloud_compute_user: a_niida@jbat.co.jp
-          prisma_cloud_compute_pass: PC_COMPUTE_PASS
-          image: mvnsample:build
-          image_tar: image.tar
-          vulnerability_threshold: critical
-          compliance_threshold: ''
-          only_fixed: true
           filters:
             branches:
               only: /security\/twistlock.*
-
-commands:
-  auth:
-    description: API call for authentication. User input will be host, username & password. Response will be the auth token to be passed on in scan command.
-    parameters:
-      access_key:
-        description: Prisma Cloud Access Key
-        type: string
-        default: $PC_ACCESS_KEY
-      secret_key:
-        description: Prisma Cloud Secret Key
-        type: env_var_name
-        default: PC_SECRET_KEY
-      prisma_cloud_api_url:
-        description: Prisma Cloud Server Url
-        type: string
-        default: $PC_CONSOLE_URL
-    steps:
-      - run: 
-          command: |
-            ACCESS_KEY=<<parameters.access_key>>
-            SECRET_KEY="$<<parameters.secret_key>>"
-            HOST_URL=<<parameters.prisma_cloud_api_url>>
-
-            if [[ -z "$HOST_URL" ]]
-            then
-              echo "Please enter a valid URL. For details, refer to: https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin/prisma-cloud-devops-security/use-the-prisma-cloud-plugin-for-circleci.html"
-              exit 1;
-            fi
-            if [[ -z "$ACCESS_KEY" || -z "$SECRET_KEY" ]]
-            then
-              echo "Invalid credentials, verify that access key and secret key in Prisma Cloud Orb parameters are valid. For details refer to: https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin/prisma-cloud-devops-security/use-the-prisma-cloud-plugin-for-circleci.html"
-              exit 1;
-            fi
-
-            result=$(curl -k -i -o -X POST <<parameters.prisma_cloud_api_url>>/login --user-agent "CircleCI PrismaCloud/DevOpsSecurity-1.0.0" -H 'Content-Type:application/json' -d '{"username":"<<parameters.access_key>>", "password":"'"${SECRET_KEY}"'"}')
-             
-            code=$(echo "$result" |grep HTTP | awk '{print $2}')
-
-            if [[ "$code" -eq 400 || "$code" -eq 401 ]] 
-            then
-              echo "Invalid credentials, verify that access key and secret key in Prisma Cloud Orb parameters are valid. For details refer to: https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin/prisma-cloud-devops-security/use-the-prisma-cloud-plugin-for-circleci.html"
-              exit 1;
-            elif [[ "$code" -eq 500 || "$code" -eq 501 || "$code" -eq 503 ]]
-            then
-              echo "Oops! Something went wrong, please try again or refer to documentation here: https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin/prisma-cloud-devops-security/use-the-prisma-cloud-plugin-for-circleci.html"
-              exit 1;
-            elif [[ "$code" -ne 200 ]]
-            then
-              echo "Oops! Something went wrong, please try again or refer to documentation here: https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin/prisma-cloud-devops-security/use-the-prisma-cloud-plugin-for-circleci.html"
-              exit 1;
-            fi
-
-            response=$(echo "$result" |grep "token")
-
-            messages="$(echo "$response" | jq .message)"
-            token="$(echo "$response" | jq .token|tr -d '"')"
-            echo "export AUTH_TOKEN=${token}" >> $BASH_ENV
-            echo "export PC_HOST=<<parameters.prisma_cloud_api_url>>" >> $BASH_ENV 
