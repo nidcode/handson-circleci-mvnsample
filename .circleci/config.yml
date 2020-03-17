@@ -41,7 +41,7 @@ jobs:
       - scan/auth
       - scan/load:
           pc_image_tar: image.tar
-          workspace_name: workspace
+          pc_workspace_name: workspace
           
       - run:
           name: scan by twistcli
